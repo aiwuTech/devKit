@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"github.com/aiwuTech/httpclient"
+	"io/ioutil"
 )
 
 // 百度地图API GEO ： http://developer.baidu.com/map/webservice-geocoding.htm
