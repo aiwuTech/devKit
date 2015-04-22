@@ -11,11 +11,21 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations
 // under the License.
-package baidumap
+package geohash
 
 import "github.com/gansidui/geohash"
 
-func GEOHash(addr string) (hash string, lat, lng float64) {
+// geohash精度的设定参考 http://en.wikipedia.org/wiki/Geohash
+// geohash length	lat bits	lng bits	lat error	lng error	km error
+// 1				2			3			±23			±23			±2500
+// 2				5			5			± 2.8		± 5.6		±630
+// 3				7			8			± 0.70		± 0.7		±78
+// 4				10			10			± 0.087		± 0.18		±20
+// 5				12			13			± 0.022		± 0.022		±2.4
+// 6				15			15			± 0.0027	± 0.0055	±0.61
+// 7				17			18			±0.00068	±0.00068	±0.076
+// 8				20			20			±0.000085	±0.00017	±0.019
+func GEOHash(addr string, precision int) (hash string, lat, lng float64) {
 	loc, err := GetGeoViaAddress(addr)
 	if err != nil {
 		return
@@ -23,7 +33,11 @@ func GEOHash(addr string) (hash string, lat, lng float64) {
 
 	lat = loc.Result.Location.Lat
 	lng = loc.Result.Location.Lng
-	hash, _ = geohash.Encode(lat, lng, 10)
+	hash, _ = geohash.Encode(lat, lng, precision)
 
 	return
+}
+
+func GetNeighbors(lat, lng float64, precision int) []string {
+	return geohash.GetNeighbors(lat, lng, precision)
 }

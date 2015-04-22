@@ -1,4 +1,4 @@
-package baidumap
+package geohash
 
 import "strconv"
 
