@@ -15,6 +15,20 @@ package geohash
 
 import "github.com/gansidui/geohash"
 
+const (
+	GeohashPrecision_2500      int = iota + 1 // 2500公里
+	GeohashPrecision_630                      // 630公里
+	GeohashPrecision_78                       // 78公里
+	GeohashPrecision_20                       // 20公里
+	GeohashPrecision_2_4                      // 2.4公里
+	GeohashPrecision_0_61                     // 610米
+	GeohashPrecision_0_01911                  // 20米
+	GeohashPrecision_0_00478                  // 5米
+	GeohashPrecision_0_0005971                // 60厘米
+	GeohashPrecision_0_0001492                // 15厘米
+	GeohashPrecision_0_0000186                // 2厘米
+)
+
 // geohash精度的设定参考 http://en.wikipedia.org/wiki/Geohash
 // geohash length	lat bits	lng bits	lat error	lng error	km error
 // 1				2			3			±23			±23			±2500
