@@ -14,12 +14,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/aiwuTech/devKit/container/maps"
 	"reflect"
-	"fmt"
 )
 
-func IntCompare(e1, e2 interface {}) int8 {
+func IntCompare(e1, e2 interface{}) int8 {
 	k1 := e1.(int)
 	k2 := e2.(int)
 
@@ -50,4 +50,3 @@ func main() {
 	fmt.Println(omap.Get(166))
 	fmt.Println(omap.Remove(867))
 }
-

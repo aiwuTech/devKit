@@ -372,9 +372,9 @@ func genRandElement() interface{} {
 		return genRandString()
 	case 2:
 		return struct {
-				num int64
-				str string
-			}{genRandInt(), genRandString()}
+			num int64
+			str string
+		}{genRandInt(), genRandString()}
 	default:
 		const length = 2
 		arr := new([length]interface{})
@@ -415,4 +415,3 @@ func genRandAZAscii() int {
 func genRandInt() int64 {
 	return rand.Int63n(10000)
 }
-

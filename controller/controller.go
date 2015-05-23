@@ -116,6 +116,7 @@ func (c *BasicController) ValidationError(obj interface{}) bool {
 
 	if !b {
 		err := c.valid.Errors[0]
+		beego.Debug("invalid params:", err.Key, err.Message)
 		c.RenderJson(response.NewResponseMsgInvalidValid(fmt.Sprintf("%s:%s", err.Key, err.Message)))
 		return true
 	}

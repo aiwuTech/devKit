@@ -17,23 +17,23 @@ import "reflect"
 
 type Mapper interface {
 	// 获取键值对应的元素值, 没有则返回nil
-	Get(key interface {}) interface {}
+	Get(key interface{}) interface{}
 	// 添加键值对，并返回旧的元素值，若没有则返回nil，true
-	Put(key interface {}, elem interface {}) (interface {}, bool)
+	Put(key interface{}, elem interface{}) (interface{}, bool)
 	// 删除键值对，返回旧的元素值，若没有返回nil
-	Remove(key interface {}) interface {}
+	Remove(key interface{}) interface{}
 	// 清除所有键值对
 	Clear()
 	// 获取键值对的数量
 	Len() int
 	// 判断是否包含给定的键值
-	Contains(key interface {}) bool
+	Contains(key interface{}) bool
 	// 获取所有键值
-	Keys() []interface {}
+	Keys() []interface{}
 	// 获取所有元素值
-	Elems() []interface {}
+	Elems() []interface{}
 	// 键值对的字典
-	ToMap() map[interface {}]interface {}
+	ToMap() map[interface{}]interface{}
 	// 获取键的类型
 	KeyType() reflect.Type
 	// 获取元素的类型
