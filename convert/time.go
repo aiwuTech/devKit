@@ -21,6 +21,7 @@ import (
 const (
 	StdDateTimeLayout = "2006-01-02 15:04:05"
 	StdDateLayout     = "2006-01-02"
+	StdLocalDateLayout = "2006年01月02日"
 	StdTimeLayout     = "15:04:05"
 )
 
