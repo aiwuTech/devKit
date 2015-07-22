@@ -20,6 +20,57 @@ import (
 	"sort"
 )
 
+var (
+	Float64CompareFunctionASC CompareFunction = func(e1, e2 interface{}) int8 {
+		k1 := e1.(float64)
+		k2 := e2.(float64)
+
+		if k1 < k2 {
+			return -1
+		} else if k1 > k2 {
+			return 1
+		} else {
+			return 0
+		}
+	}
+
+	Float64CompareFunctionDESC CompareFunction = func(e1, e2 interface{}) int8 {
+		return -Float64CompareFunctionASC(e1, e2)
+	}
+
+	Uint64CompareFunctionASC CompareFunction = func(e1, e2 interface{}) int8 {
+		k1 := e1.(uint64)
+		k2 := e2.(uint64)
+
+		if k1 < k2 {
+			return -1
+		} else if k1 > k2 {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	Uint64CompareFunctionDESC CompareFunction = func(e1, e2 interface{}) int8 {
+		return -Uint64CompareFunctionASC(e1, e2)
+	}
+
+	Int64CompareFunctionASC CompareFunction = func(e1, e2 interface{}) int8 {
+		k1 := e1.(int64)
+		k2 := e2.(int64)
+
+		if k1 < k2 {
+			return -1
+		} else if k1 > k2 {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	Int64CompareFunctionDESC CompareFunction = func(e1, e2 interface{}) int8 {
+		return -Int64CompareFunctionASC(e1, e2)
+	}
+)
+
 // compareFunc的结果值：
 //   小于0: 第一个参数小于第二个参数
 //   等于0: 第一个参数等于第二个参数

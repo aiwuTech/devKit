@@ -183,3 +183,7 @@ func NewDBPaginator(page, size int) *Paginator {
 		page:        page,
 	}
 }
+
+func (p *Paginator) AddPage() {
+	p.page += 1
+}

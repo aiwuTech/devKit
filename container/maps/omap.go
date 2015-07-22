@@ -22,6 +22,10 @@ import (
 // 有序map接口
 type OrderedMapper interface {
 	Mapper
+	// 获取key对应的第一个值
+	GetFirst(key interface {}) interface {}
+	// 获取key对应的所有值
+	GetAll(key interface {}) []interface {}
 	// 获取第一个键值，没有返回nil
 	FirstKey() interface{}
 	// 获取最后一个键值，没有返回nil
@@ -37,10 +41,18 @@ type OrderedMapper interface {
 type omap struct {
 	keys     Keys
 	elemType reflect.Type
-	m        map[interface{}]interface{}
+	m        map[interface{}][]interface{}
 }
 
 func (m *omap) Get(key interface{}) interface{} {
+	return m.m[key]
+}
+
+func (m *omap) GetFirst(key interface {}) interface {} {
+	return m.m[key][0]
+}
+
+func (m *omap) GetAll(key interface {}) []interface {} {
 	return m.m[key]
 }
 
@@ -61,13 +73,16 @@ func (m *omap) Put(key interface{}, elem interface{}) (interface{}, bool) {
 		return nil, false
 	}
 
-	oldElem, ok := m.m[key]
-	m.m[key] = elem
-	if !ok {
+	oldElems, ok := m.m[key]
+	if ok {
+		m.m[key] = append(m.m[key], elem)
+	} else {
 		m.keys.Add(key)
+		m.m[key] = make([]interface {}, 0)
+		m.m[key] = append(m.m[key], elem)
 	}
 
-	return oldElem, true
+	return oldElems, true
 }
 
 func (m *omap) Remove(key interface{}) interface{} {
@@ -81,12 +96,17 @@ func (m *omap) Remove(key interface{}) interface{} {
 }
 
 func (m *omap) Clear() {
-	m.m = make(map[interface{}]interface{})
+	m.m = make(map[interface{}][]interface{})
 	m.keys.Clear()
 }
 
 func (m *omap) Len() int {
-	return len(m.m)
+	length := 0
+	for _, val := range m.m {
+		length += len(val)
+	}
+
+	return length
 }
 
 func (m *omap) Contains(key interface{}) bool {
@@ -127,12 +147,15 @@ func (m *omap) Sub(fromKey, toKey interface{}) OrderedMapper {
 		endIndex = omapLen
 	}
 
-	var key, elem interface{}
+	var key interface{}
+	var elems []interface {}
 	for i := beginIndex; i < endIndex; i++ {
 		key = m.keys.Get(i)
-		elem = m.Get(key)
+		elems = m.GetAll(key)
 
-		newOmap.Put(key, elem)
+		for _, elem := range elems {
+			newOmap.Put(key, elem)
+		}
 	}
 
 	return newOmap
@@ -153,7 +176,7 @@ func (m *omap) Keys() []interface{} {
 func (m *omap) Elems() []interface{} {
 	elems := make([]interface{}, 0)
 	for _, key := range m.Keys() {
-		elems = append(elems, m.Get(key))
+		elems = append(elems, m.GetAll(key)...)
 	}
 
 	return elems
@@ -206,6 +229,6 @@ func NewOrderMap(keys Keys, elemType reflect.Type) OrderedMapper {
 	return &omap{
 		keys:     keys,
 		elemType: elemType,
-		m:        make(map[interface{}]interface{}),
+		m:        make(map[interface{}][]interface{}),
 	}
 }

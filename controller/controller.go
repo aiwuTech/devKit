@@ -16,12 +16,12 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/aiwuTech/models"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/validation"
 	"github.com/globalways/response"
-	"github.com/globalways/utils_go/filter"
 	"net/http"
 	"net/url"
 	"strings"
@@ -31,6 +31,7 @@ var (
 	_ logs.BeeLogger
 	_ url.Values
 	_ context.BeegoInput
+	_ context.BeegoOutput
 )
 
 type BasicController struct {
@@ -45,11 +46,15 @@ func (c *BasicController) Prepare() {
 
 	//prepare for enable gzip
 	c.Ctx.Output.EnableGzip = true
+
+	beego.Debug("API Request:", c.Controller.Ctx.Request)
 }
 
 func (c *BasicController) Finish() {
 	c.valid.Clear()
 	c.fieldErrors = c.fieldErrors[:0]
+
+//	beego.Debug("API Response:", c.Controller.Ctx)
 }
 
 func (c *BasicController) IsGet() bool {
@@ -170,8 +175,8 @@ func (c *BasicController) GetHttpRequest() *http.Request {
 }
 
 // get request sql filter
-func (c *BasicController) RequestSQLFilter() *filter.SQLFilter {
-	return filter.NewSQLFilter(c.GetHttpRequest())
+func (c *BasicController) RequestSQLFilter() *models.SQLFilter {
+	return models.NewSQLFilter(c.GetHttpRequest())
 }
 
 // unmarshal json http body to object

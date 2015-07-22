@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"math"
 )
 
 //字符串转长整型
@@ -145,4 +146,9 @@ func SplitData(original map[string]interface{}, fields []string) (data map[strin
 	}
 
 	return
+}
+
+func Float64Trunc(v float64, n int) float64 {
+	pow10_n := math.Pow10(n)
+	return math.Trunc((v+0.5/pow10_n)*pow10_n) / pow10_n
 }

@@ -7,14 +7,14 @@ package random
 
 import (
 	"bytes"
+	_ "errors"
+	_ "fmt"
 	"github.com/aiwuTech/devKit/convert"
-	"math/rand"
-	"time"
-	_"errors"
-	_"fmt"
 	"math"
-	_"strconv"
-	_"strings"
+	"math/rand"
+	_ "strconv"
+	_ "strings"
+	"time"
 )
 
 //生成随机字符串
@@ -60,7 +60,6 @@ func RandIntStr(min, max int) string {
 	return convert.Int2str(i)
 }
 
-
 // Copyright (C) 2012-2013 Fuchun(Aying) All rights reserved.
 //
 // Licensed to the Apache Software Foundation (ASF) under one or more
@@ -100,7 +99,7 @@ var (
 func RandomSpec0(count uint, start, end int, letters, numbers bool,
 	chars []rune, rand *rand.Rand) string {
 	if count == 0 {
-		return""
+		return ""
 	}
 	if start == 0 && end == 0 {
 		end = 'z' + 1
@@ -122,7 +121,7 @@ func RandomSpec0(count uint, start, end int, letters, numbers bool,
 		}
 		if letters && ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) ||
 			numbers && (ch >= '0' && ch <= '9') ||
-				(!letters && !numbers) {
+			(!letters && !numbers) {
 			if ch >= rune(56320) && ch <= rune(57343) {
 				if count == 0 {
 					count++
