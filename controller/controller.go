@@ -16,7 +16,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/aiwuTech/models"
+	"github.com/aiwuTech/ormAdapter"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/logs"
@@ -122,7 +122,7 @@ func (c *BasicController) ValidationError(obj interface{}) bool {
 	if !b {
 		err := c.valid.Errors[0]
 		beego.Debug("invalid params:", err.Key, err.Message)
-		c.RenderJson(response.NewResponseMsgInvalidValid(fmt.Sprintf("%s:%s", err.Key, err.Message)))
+		c.RenderJson(response.NewResponseMsgInvalidValid(fmt.Sprintf("%s%s", err.Key, err.Message)))
 		return true
 	}
 
@@ -175,8 +175,8 @@ func (c *BasicController) GetHttpRequest() *http.Request {
 }
 
 // get request sql filter
-func (c *BasicController) RequestSQLFilter() *models.SQLFilter {
-	return models.NewSQLFilter(c.GetHttpRequest())
+func (c *BasicController) RequestSQLFilter() *ormAdapter.SQLFilter {
+	return ormAdapter.NewSQLFilter(c.GetHttpRequest())
 }
 
 // unmarshal json http body to object

@@ -24,14 +24,14 @@ type MailManager struct {
 	username    string
 	password    string
 	messageChan chan *Message
-	mailer      *gomail.Mailer
+	mailer      *gomail.Dialer
 }
 
 func (mgr *MailManager) send(messages <-chan *Message) {
 	for {
 		select {
 		case msg := <-messages:
-			if err := mgr.mailer.Send(msg.mail()); err != nil {
+			if err := mgr.mailer.DialAndSend(msg.mail()); err != nil {
 				log.Printf("mail send err:%v\n", err)
 			}
 		}
@@ -49,7 +49,7 @@ func NewMailManager(host, userName, password string, port, chanLen int) *MailMan
 		username:    userName,
 		password:    password,
 		messageChan: make(chan *Message, chanLen),
-		mailer:      gomail.NewMailer(host, userName, password, port),
+		mailer:      gomail.NewPlainDialer(host, port, userName, password),
 	}
 
 	// message channel start

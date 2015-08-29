@@ -14,8 +14,8 @@
 package mail
 
 import (
-	"github.com/aiwuTech/container"
 	"github.com/go-gomail/gomail"
+	"github.com/aiwuTech/container"
 )
 
 type Message struct {

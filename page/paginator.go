@@ -59,7 +59,7 @@ func (p *Paginator) Page() int {
 }
 
 func (p *Paginator) Size() int {
-	if p.perPageNums > 0 {
+	if p.perPageNums >= 0 {
 		return p.perPageNums
 	}
 

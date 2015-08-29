@@ -33,6 +33,7 @@ const (
 	Minute       = Second * 60
 	Hour         = Minute * 60
 	Day          = Hour * 24
+	Week         = Day * 7
 )
 
 func StrTime2Unix(strTime string, layout string) int64 {

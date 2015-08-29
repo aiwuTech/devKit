@@ -18,12 +18,27 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
+	"github.com/globalways/response"
 	"net/url"
 	"sort"
 	"time"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/context"
 )
+
+var (
+	err_miss_appid        = "缺少参数appid."
+	err_invalid_appid     = "参数appid不正确."
+	err_miss_sign         = "缺少参数signature."
+	err_invalid_sign      = "请求签名不正确."
+	err_miss_timestamp    = "缺少参数timestamp."
+	err_format_timestamp  = "参数timestamp格式错误,应为2006-01-02 15:04:05."
+	err_invalid_timestamp = "请求已过期."
+)
+
+func serveJson(ctx *context.Context, data interface{}) {
+	ctx.Output.Json(data, false, false)
+}
 
 type AppIdToAppSecret func(string) string
 
@@ -39,50 +54,61 @@ func APIBaiscAuth(appid, appkey string) beego.FilterFunc {
 
 func APIAuthWithFunc(f AppIdToAppSecret, timeout int) beego.FilterFunc {
 	return func(ctx *context.Context) {
+		if ctx.Input.IsOptions() {
+			return
+		}
+
+		ctx.Input.Request.ParseForm()
+		beego.Debug(ctx.Input.Request.Form)
 		if ctx.Input.Query("appid") == "" {
-			ctx.Output.SetStatus(403)
-			ctx.WriteString("miss query param: appid")
 			beego.Debug("miss query param: appid")
+			rspMsg := response.NewResponseMsgInvalidAuth(err_miss_appid)
+			serveJson(ctx, rspMsg)
 			return
 		}
 		appsecret := f(ctx.Input.Query("appid"))
 		if appsecret == "" {
-			ctx.Output.SetStatus(403)
-			ctx.WriteString("not exist this appid")
 			beego.Debug("not exist this appid")
+			rspMsg := response.NewResponseMsgInvalidAuth(err_invalid_appid)
+			serveJson(ctx, rspMsg)
 			return
 		}
-		if ctx.Input.Query("signature") == "" {
-			ctx.Output.SetStatus(403)
-			ctx.WriteString("miss query param: signature")
+		signature := ctx.Input.Query("signature")
+		if signature == "" {
 			beego.Debug("miss query param: signature")
+			rspMsg := response.NewResponseMsgInvalidAuth(err_miss_sign)
+			serveJson(ctx, rspMsg)
 			return
 		}
 		if ctx.Input.Query("timestamp") == "" {
-			ctx.Output.SetStatus(403)
-			ctx.WriteString("miss query param: timestamp")
 			beego.Debug("miss query param: timestamp")
+			rspMsg := response.NewResponseMsgInvalidAuth(err_miss_timestamp)
+			serveJson(ctx, rspMsg)
 			return
 		}
 		u, err := time.Parse("2006-01-02 15:04:05", ctx.Input.Query("timestamp"))
 		if err != nil {
-			ctx.Output.SetStatus(403)
-			ctx.WriteString("timestamp format is error, should 2006-01-02 15:04:05")
 			beego.Debug("timestamp format is error, should 2006-01-02 15:04:05")
+			rspMsg := response.NewResponseMsgInvalidAuth(err_format_timestamp)
+			serveJson(ctx, rspMsg)
 			return
 		}
 		t := time.Now()
 		if t.Sub(u).Seconds() > float64(timeout) {
-			ctx.Output.SetStatus(403)
-			ctx.WriteString("timeout! the request time is long ago, please try again")
 			beego.Debug("timeout! the request time is long ago, please try again")
+			rspMsg := response.NewResponseMsgInvalidAuth(err_invalid_timestamp)
+			serveJson(ctx, rspMsg)
 			return
 		}
-		if ctx.Input.Query("signature") !=
-			Signature(appsecret, ctx.Input.Method(), ctx.Request.Form, ctx.Input.Url()) {
-			ctx.Output.SetStatus(403)
-			ctx.WriteString("auth failed")
+		result := Signature(appsecret, ctx.Input.Method(), ctx.Request.Form, ctx.Input.Url())
+		beego.Debug("ctx.Input.Query('signature'):", signature)
+		beego.Debug("ctx.Input.Uri():", ctx.Input.Uri())
+		beego.Debug("Signature:", result)
+		if signature != result {
 			beego.Debug("auth failed")
+			rspMsg := response.NewResponseMsgInvalidAuth(err_invalid_sign)
+			serveJson(ctx, rspMsg)
+			return
 		}
 	}
 }
@@ -106,9 +132,6 @@ func Signature(appsecret, method string, params url.Values, requestURL string) (
 	beego.Debug("query:", query)
 	string_to_sign := fmt.Sprintf("%v\n%v\n%v\n", method, query, requestURL)
 	beego.Debug("string to sign:", string_to_sign)
-	defer func() {
-		beego.Debug("result:", result)
-	}()
 
 	sha256 := sha256.New
 	hash := hmac.New(sha256, []byte(appsecret))
