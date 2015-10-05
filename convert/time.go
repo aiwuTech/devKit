@@ -66,3 +66,21 @@ func IsFuture(timeUnix int64) bool {
 func IsPast(timeUnix int64) bool {
 	return !IsFuture(timeUnix)
 }
+
+type Cost struct {
+    t1 time.Time
+    t2 time.Time
+}
+
+func NewTimeCost() *Cost {
+    return &Cost{}
+}
+
+func (c *Cost) Begin() {
+    c.t1 = time.Now()
+}
+
+func (c *Cost) Cost() time.Duration {
+    c.t2 = time.Now()
+    return c.t2.Sub(c.t1)
+}

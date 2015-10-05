@@ -47,7 +47,7 @@ func (c *BasicController) Prepare() {
 	//prepare for enable gzip
 	c.Ctx.Output.EnableGzip = true
 
-	beego.Debug("API Request:", c.Controller.Ctx.Request)
+	beego.Debug("API Request:", c.GetHttpRequest())
 }
 
 func (c *BasicController) Finish() {
@@ -94,7 +94,7 @@ func (c *BasicController) ForbidenHttp() {
 // handle http request param error
 func (c *BasicController) HandleParamError() bool {
 	if c.IsParamsWrong() {
-		c.RenderJson(response.NewResponseMsgInvalidParam(fmt.Sprintf("%s%s.", c.fieldErrors[0].Field, c.fieldErrors[0].Message)))
+		c.RenderJson(response.NewResponseMsgInvalidParam(fmt.Sprintf("<%s>%s", c.fieldErrors[0].Field, c.fieldErrors[0].Message)))
 		return true
 	}
 
@@ -115,14 +115,14 @@ func (c *BasicController) AppenWrongParams(err *response.FieldError) {
 func (c *BasicController) ValidationError(obj interface{}) bool {
 	b, err := c.valid.Valid(obj)
 	if err != nil {
-		c.RenderJson(response.NewResponseMsgInvalidValid(err.Error()))
+		c.RenderJson(response.NewResponseMsgInternalError(err.Error()))
 		return true
 	}
 
 	if !b {
 		err := c.valid.Errors[0]
 		beego.Debug("invalid params:", err.Key, err.Message)
-		c.RenderJson(response.NewResponseMsgInvalidValid(fmt.Sprintf("%s%s", err.Key, err.Message)))
+		c.RenderJson(response.NewResponseMsgInvalidParam(fmt.Sprintf("<%s>%s", err.Key, err.Message)))
 		return true
 	}
 
@@ -169,6 +169,10 @@ func (c *BasicController) GetHttpBody() []byte {
 	return c.Ctx.Input.RequestBody
 }
 
+func (c *BasicController) GetRequestRemoteAddr() string {
+    return c.Ctx.Request.RemoteAddr
+}
+
 // get http request
 func (c *BasicController) GetHttpRequest() *http.Request {
 	return c.Ctx.Request
@@ -197,46 +201,6 @@ func (c *BasicController) SetHttpContentType(ext string) {
 // combine url
 func (c *BasicController) CombineUrl(router string) string {
 	return c.Ctx.Input.Site() + router
-}
-
-func (c *BasicController) UnmarshalForm() (args map[string]interface{}) {
-	args = make(map[string]interface{})
-	values := c.Input()
-	for k, v := range values {
-		args[k] = v[0]
-	}
-
-	return
-}
-
-// fields
-func (c *BasicController) FieldArgs(original map[string]interface{}) (args map[string]interface{}) {
-	args = make(map[string]interface{})
-	fields := c.Fields()
-	if len(fields) != 0 {
-		for _, field := range fields {
-			if val, ok := original[field]; !ok {
-				c.AppenWrongParams(response.NewFieldError(field, fmt.Sprintf("更新参数值%v未传递.", field)))
-			} else {
-				args[field] = val
-			}
-		}
-	} else {
-		args = original
-	}
-
-	return
-}
-
-func (c *BasicController) Fields() (fields []string) {
-	// 拆分fields
-	fields = make([]string, 0)
-	f := c.GetString("fields")
-	if f != "" {
-		fields = strings.Split(f, ",")
-	}
-
-	return
 }
 
 func (c *BasicController) DefaultPageSize() {

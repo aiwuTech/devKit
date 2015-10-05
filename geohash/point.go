@@ -123,7 +123,6 @@ func (p *Point) MarshalJSON() ([]byte, error) {
 // Decodes the current Point from a JSON body.
 // Throws an error if the body of the point cannot be interpreted by the JSON body
 func (p *Point) UnmarshalJSON(data []byte) error {
-	// TODO throw an error if there is an issue parsing the body.
 	dec := json.NewDecoder(bytes.NewReader(data))
 	var values map[string]float64
 	err := dec.Decode(&values)
