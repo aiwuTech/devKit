@@ -5,10 +5,10 @@ package convert
 
 import (
 	"errors"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
-	"math"
 )
 
 //字符串转长整型
@@ -32,6 +32,10 @@ func Str2Int(s string) int {
 	return int(Str2Int64(s))
 }
 
+func Str2Int32(s string) int32 {
+	return int32(Str2Int64(s))
+}
+
 func Str2Byte(s string) byte {
 	return byte(Str2Int64(s))
 }
@@ -47,6 +51,10 @@ func Str2Uint(s string) uint {
 //整形转字符串
 func Int2str(i int) string {
 	return strconv.Itoa(i)
+}
+
+func Int322str(i int32) string {
+	return Int642str(int64(i))
 }
 
 //长整型转字符串

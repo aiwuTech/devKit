@@ -14,18 +14,20 @@
 package convert
 
 import (
+	"github.com/jinzhu/now"
 	"log"
 	"time"
-	"github.com/jinzhu/now"
 )
 
 const (
-	StdDateTimeLayout   = "2006-01-02 15:04:05"
-	StdDateLayout       = "2006-01-02"
-	StdMM_ddLayout       = "01-02"
-	StdLocalDateLayout  = "2006年01月02日"
-	StdLocalMonthLayout = "2006年01月"
-	StdTimeLayout       = "15:04:05"
+	StdDateTimeLayout      = "2006-01-02 15:04:05"
+	StdDateLayout          = "2006-01-02"
+	StdMM_ddLayout         = "01-02"
+	StdLocalDateLayout     = "2006年01月02日"
+	StdLocalDateTimeLayout = "2006年01月02日 15时04分05秒"
+	StdLocalMonthLayout    = "2006年01月"
+	StdLocalMonthDayLayout = "01月02日"
+	StdTimeLayout          = "15:04:05"
 )
 
 const (
@@ -37,13 +39,27 @@ const (
 )
 
 func StrTime2Unix(strTime string, layout string) int64 {
-	t, e := time.Parse(layout, strTime)
+	return Str2Time(strTime, layout).Unix()
+}
+
+func Str2Time(strTime, layout string) time.Time {
+	if strTime == "" || layout == "" {
+		return time.Now()
+	}
+	t, e := time.ParseInLocation(layout, strTime, time.Local)
+	//	t, e := time.Parse(layout, strTime)
 	if e != nil {
 		log.Printf("<convert> parse time err: %+v\n", e)
-		return 0
+		return time.Now()
 	}
 
-	return t.Unix()
+	return t
+}
+
+func StrUnix2Time(unix string) time.Time {
+	unixTimestamp := Str2Int64(unix)
+
+	return time.Unix(unixTimestamp, 0)
 }
 
 // 是否是今日
@@ -54,7 +70,7 @@ func IsToday(timeUnix int64) bool {
 
 // 是否是昨日
 func IsYesterday(timeUnix int64) bool {
-	return IsToday(timeUnix+86400)
+	return IsToday(timeUnix + 86400)
 }
 
 // 是否是未来
@@ -68,19 +84,20 @@ func IsPast(timeUnix int64) bool {
 }
 
 type Cost struct {
-    t1 time.Time
-    t2 time.Time
+	t1 time.Time
+	t2 time.Time
 }
 
 func NewTimeCost() *Cost {
-    return &Cost{}
+	return &Cost{}
 }
 
-func (c *Cost) Begin() {
-    c.t1 = time.Now()
+func (c *Cost) Begin() *Cost {
+	c.t1 = time.Now()
+	return c
 }
 
 func (c *Cost) Cost() time.Duration {
-    c.t2 = time.Now()
-    return c.t2.Sub(c.t1)
+	c.t2 = time.Now()
+	return c.t2.Sub(c.t1)
 }

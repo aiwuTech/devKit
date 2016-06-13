@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/aiwuTech/httpclient"
 	"io/ioutil"
+	"log"
 )
 
 // 百度地图API GEO ： http://developer.baidu.com/map/webservice-geocoding.htm
@@ -16,17 +17,55 @@ import (
 
 var (
 	AppKey string = "xwCIsZzaLkFYLkCCfuAKUbkG" // baidu's
+	Debug  bool   = true
+	_      log.Logger
 )
 
 const (
-	reqURLForGEO string = "http://api.map.baidu.com/geocoder/v2/?ak="
-	reqURLForIP  string = "http://api.map.baidu.com/location/ip?ak="
+	reqURLForGEO     string = "http://api.map.baidu.com/geocoder/v2/?ak="
+	reqURLForIP      string = "http://api.map.baidu.com/location/ip?ak="
+	reqURLForGEOCONV string = "http://api.map.baidu.com/geoconv/v1/?ak="
 )
 
-func GetAddressViaGEO(lat, lng string) (*StructGEOToAddress, error) {
+const (
+	Coords_wgs84  = "wgs84ll" // GPS设备获取的角度坐标，wgs84坐标;
+	Coords_gcj02  = "gcj02ll"
+	Coords_bd09ll = "bd09ll"
+	Coords_bd09mc = "bd09mc"
+)
+
+//
+//func ConvGEO(lat, lng float64, from, to CoordsType) (*StructGEOCONV, error) {
+//	res := new(StructGEOCONV)
+//
+//	parameter := fmt.Sprintf("&coords=%v,%v&from=%v&to=%v&output=json", lat, lng, from, to)
+//	reqURL := fmt.Sprintf("%s%s%s", reqURLForGEOCONV, AppKey, parameter)
+//
+//	if Debug {
+//		log.Printf("baidu request url: %v", reqURL)
+//	}
+//
+//	res2, err := requestBaidu("GEOCONV", reqURL)
+//	if Debug {
+//		log.Printf("baidu geo conv resp: %v, err: %v", res2, err)
+//	}
+//	if err != nil {
+//		return res, err
+//	}
+//
+//	if res2.(*StructGEOCONV).Status != 0 {
+//		message := fmt.Sprintf("百度 API 报错：status: %v, msg:%v", res2.(*StructGEOCONV).Status, res2.(*StructGEOCONV).Msg)
+//		return res, errors.New(message)
+//	}
+//
+//	res3 := res2.(*StructGEOCONV)
+//	return res3, nil
+//}
+
+func GetAddressViaGEO(lat, lng, coordtype string) (*StructGEOToAddress, error) {
 	res := new(StructGEOToAddress)
 
-	parameter := fmt.Sprintf("&location=%s,%s&output=json&pois=0", lat, lng)
+	parameter := fmt.Sprintf("&location=%s,%s&output=json&pois=0&coordtype=%v", lat, lng, coordtype)
 	reqURL := fmt.Sprintf("%s%s%s", reqURLForGEO, AppKey, parameter)
 
 	res2, err := requestBaidu("GetAddressViaGEO", reqURL)
@@ -129,6 +168,10 @@ func getResStruct(reqType string) (interface{}, error) {
 
 	if reqType == "GetAddressViaGEO" {
 		return new(StructGEOToAddress), nil
+	}
+
+	if reqType == "GEOCONV" {
+		return new(StructGEOCONV), nil
 	}
 	return res, errors.New("结构体请求错误")
 }

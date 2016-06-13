@@ -2,6 +2,17 @@ package geohash
 
 import "strconv"
 
+type StructGEOCONV struct {
+	Status int64           `json:"status"`
+	Result []*GEOCONVPoint `json:"result"`
+	Msg    string          `json:"message"`
+}
+
+type GEOCONVPoint struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+}
+
 type StructGEOToAddress struct {
 	Status int64              `json:"status"`
 	Result *GEOToAddressInner `json:"result"`
